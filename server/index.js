@@ -8,8 +8,13 @@ dotenv.config();
 
 const controller = require("./controller");
 
+const { MONGO_IP, MONGO_PORT, MONGO_DATABASE_NAME, NODE_ENV, NODE_PORT } = process.env;
+
+const mongoUrl = `mongodb://${MONGO_IP}:${MONGO_PORT}/${MONGO_DATABASE_NAME}`,
+    port = NODE_ENV == "production" ? NODE_PORT : 5000;
+
 mongoose
-  .connect(process.env.DATABASE_URL, {
+  .connect(mongoUrl, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
@@ -19,8 +24,9 @@ mongoose
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json());
 
-app.use("/test", controller);
+app.use("/code", controller);
 
-const port = process.env.PORT || 5000;
 app.listen(port);
 console.log("App is listening on port " + port);
+
+module.exports = app; 

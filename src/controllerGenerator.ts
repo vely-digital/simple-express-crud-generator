@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction } from "express";
 import { IGenerateModelMethods } from "./interfaces/modelGeneratorInterfaces";
 import { CustomRequest } from "./interfaces/controllerGeneratorInterfaces";
 
-const noTokenAuthorise = async (
+const noMiddleware = async (
   req: CustomRequest,
   res: Response,
   next: NextFunction
@@ -20,40 +20,33 @@ const generateController = (
     customEdit,
     customDelete,
   }: IGenerateModelMethods = {},
-  tokenAuthorize: (
-    req: CustomRequest,
-    res: Response,
-    next: NextFunction
-  ) => any = noTokenAuthorise
+  middlewareArray: any = noMiddleware
 ) => {
-  console.log("TEST", tokenAuthorize);
   if (customList == undefined) {
     router.post(
       "/list",
-      tokenAuthorize,
+      middlewareArray,
       async (req: CustomRequest, res: Response) => {
         const saveItem = await model.findBy(req.body);
         if (saveItem.status === 200) {
           res.json(saveItem.payload);
         } else {
-          console.log(saveItem.err);
           res.status(500).send(saveItem.err);
         }
       }
     );
   } else {
-    router.post("/list", tokenAuthorize, customList);
+    router.post("/list", middlewareArray, customList);
   }
 
   if (customGet == undefined) {
     router.get(
       "/:id",
-      tokenAuthorize,
+      middlewareArray,
       async (req: CustomRequest, res: Response) => {
         let modelGet = await model.findOneBy(req.params.id);
 
         if (modelGet.status === 200) {
-          // res.render("images", { items: items.items });
           res.json(modelGet.payload);
         } else {
           res.status(500).send(modelGet.err);
@@ -61,13 +54,13 @@ const generateController = (
       }
     );
   } else {
-    router.get("/:id", tokenAuthorize, customGet);
+    router.get("/:id", middlewareArray, customGet);
   }
 
   if (customCreate == undefined) {
     router.post(
       "/",
-      tokenAuthorize,
+      middlewareArray,
       async (req: CustomRequest, res: Response) => {
         const items = await model.createBy(req.body);
 
@@ -79,15 +72,14 @@ const generateController = (
       }
     );
   } else {
-    router.post("/", tokenAuthorize, customCreate);
+    router.post("/", middlewareArray, customCreate);
   }
 
   if (customDelete == undefined) {
     router.delete(
       "/:id",
-      tokenAuthorize,
+      middlewareArray,
       async (req: CustomRequest, res: Response) => {
-        console.log(req.params.id);
         const items = await model.deleteBy(req.params.id);
 
         if (items.status == 200) {
@@ -98,12 +90,12 @@ const generateController = (
       }
     );
   } else {
-    router.delete("/", tokenAuthorize, customDelete);
+    router.delete("/", middlewareArray, customDelete);
   }
 
   router.delete(
     "/",
-    tokenAuthorize,
+    middlewareArray,
     async (req: CustomRequest, res: Response) => {
       const items = await model.multipleDeleteBy(req.body);
 
@@ -118,7 +110,7 @@ const generateController = (
   if (customEdit == undefined) {
     router.put(
       "/:id",
-      tokenAuthorize,
+      middlewareArray,
       async (req: CustomRequest, res: Response) => {
         const item = await model.editBy(req.params.id, req.body);
 
@@ -130,7 +122,7 @@ const generateController = (
       }
     );
   } else {
-    router.put(":id", tokenAuthorize, customEdit);
+    router.put(":id", middlewareArray, customEdit);
   }
 };
 

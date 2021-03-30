@@ -27,7 +27,7 @@ const generateModel = (
         payload,
       };
     } catch (err) {
-      console.log(err);
+      console.error(err);
       return {
         status: 500,
         payload: err,
@@ -52,13 +52,12 @@ const generateModel = (
         : {};
 
       let customFilter = { ...searchFilter };
-      console.log(customFilter);
 
-      let payload = await this.find(customFilter)
+      let items = await this.find(customFilter)
         .populate(listPopulate)
         .select(listSelect)
         .sort(sort)
-        .skip(page * limit)
+        .skip((page - 1) * limit)
         .limit(limit);
 
       let count = await this.countDocuments(customFilter);
@@ -68,12 +67,12 @@ const generateModel = (
         payload: {
           count,
           page,
-          pageSize: payload.length,
-          payload,
+          pageSize: items.length,
+          payload: items,
         },
       };
     } catch (err) {
-      console.log(err);
+      console.error(err);
       return {
         status: 500,
         payload: err,
@@ -90,7 +89,7 @@ const generateModel = (
         payload: saved,
       };
     } catch (err) {
-      console.log(err);
+      console.error(err);
       return { status: 500, payload: err };
     }
   };
@@ -111,7 +110,7 @@ const generateModel = (
         payload: saved,
       };
     } catch (err) {
-      console.log(err);
+      console.error(err);
       return { status: 500, payload: err };
     }
   };

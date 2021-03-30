@@ -1,7 +1,21 @@
-POST http://localhost:5000/test/list
+POST http://localhost:5000/code/list
 Content-Type: application/json
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZjI0YzM0MjlhNzAzODQzMjg2YjBmM2UiLCJpYXQiOjE1OTYzODEzNjJ9.BIRWPGNV10VfzC02M1Nt3SNZNax3WtWWPX_UsRqK6Qo
 
 {
-    "code": "test"
+    "limit": 2,
+    "page": 1,
+    "autocomplete": { "key": "code", "value": "tes"},
+    "sort": "+code"
 }
+
+######
+
+POST http://localhost:5000/test/
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZjI0YzM0MjlhNzAzODQzMjg2YjBmM2UiLCJpYXQiOjE1OTYzODEzNjJ9.BIRWPGNV10VfzC02M1Nt3SNZNax3WtWWPX_UsRqK6Qo
+
+{
+    "code": "test2",
+}
+
