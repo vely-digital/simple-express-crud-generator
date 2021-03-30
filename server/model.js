@@ -3,7 +3,7 @@ const Generator = require("../dist/index");
 
 const modelSchema = new mongoose.Schema(
   {
-    code: {
+    cat: {
       type: String,
       required: true,
       index: true,

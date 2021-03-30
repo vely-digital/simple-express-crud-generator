@@ -1,5 +1,5 @@
 let mongoose = require("mongoose");
-let Code = require("../server/model");
+let Cat = require("../server/model");
 
 let chai = require("chai");
 let chaiHttp = require("chai-http");
@@ -8,19 +8,19 @@ let should = chai.should();
 
 chai.use(chaiHttp);
 //Our parent block
-describe("Codes", () => {
+describe("cats", () => {
   beforeEach((done) => {
     //Before each test we empty the database
-    Code.remove({}, (err) => {
+    Cat.remove({}, (err) => {
       done();
     });
   });
 
-  describe("/GET code", () => {
-    it("it should GET all the codes", (done) => {
+  describe("/GET cat", () => {
+    it("it should GET all the cat", (done) => {
       chai
         .request(server)
-        .post("/code/list")
+        .post("/cat/list")
         .end((err, res) => {
           const expectedObject = {
             count: 0,
@@ -35,92 +35,91 @@ describe("Codes", () => {
     });
   });
 
-  describe("/POST code", () => {
-    it("it should POST a code", (done) => {
-      let code = {
-        code: "Test our dear code",
+  describe("/POST cat", () => {
+    it("it should POST a cat", (done) => {
+      let cat = {
+        cat: "Test our dear cat",
       };
       chai
         .request(server)
-        .post("/code")
-        .send(code)
+        .post("/cat")
+        .send(cat)
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.a("object");
           res.body.should.have.property("_id").and.to.be.an("string");
           res.body.should.have
-            .property("code")
-            .and.to.be.equal("Test our dear code");
+            .property("cat")
+            .and.to.be.equal("Test our dear cat");
           done();
         });
     });
   });
 
-  describe("/GET/:id code", () => {
-    it("it should GET a code by the given id", (done) => {
-      let code = new Code({
-        code: "Our dear test no.2",
+  describe("/GET/:id cat", () => {
+    it("it should GET a cat by the given id", (done) => {
+      let cat = new Cat({
+        cat: "Our dear test no.2",
       });
-      code.save((err, code) => {
+      cat.save((err, cat) => {
         chai
           .request(server)
-          .get("/code/" + code.id)
-          //   .send(code)
+          .get("/cat/" + cat.id)
           .end((err, res) => {
             res.should.have.status(200);
             res.body.should.be.a("object");
-            res.body.should.have.property("code");
-            res.body.should.have.property("_id").eql(code.id);
+            res.body.should.have.property("cat");
+            res.body.should.have.property("_id").eql(cat.id);
             done();
           });
       });
     });
   });
 
-  describe("/PUT/:id code", () => {
-    it("it should PUT a code by the given id and change it", (done) => {
-      let code = new Code({
-        code: "Our dear test no.2",
+  describe("/PUT/:id cat", () => {
+    it("it should PUT a cat by the given id and change it", (done) => {
+      let cat = new Cat({
+        cat: "Our dear test no.2",
       });
 
-      let changedCode = {
-        code: "Out dear changed test no.3 :)",
+      let changedCat = {
+        cat: "Out dear changed test no.3 :)",
       };
-      code.save((err, code) => {
+      cat.save((err, cat) => {
         chai
           .request(server)
-          .put("/code/" + code.id)
-          .send(changedCode)
+          .put("/cat/" + cat.id)
+          .send(changedCat)
           .end((err, res) => {
             res.should.have.status(200);
             res.body.should.be.a("object");
-            res.body.should.have.property("code").eql(changedCode.code);
-            res.body.should.have.property("_id").eql(code.id);
+            res.body.should.have.property("cat").eql(changedCat.cat);
+            res.body.should.have.property("_id").eql(cat.id);
             done();
           });
       });
     });
   });
 
-  describe("/GET code, test list general", async () => {
+  describe("/GET cat, test list general", async () => {
     beforeEach(async () => {
-      await new Code({
-        code: "Our dear test no.1",
+      await new Cat({
+        cat: "Our dear test no.1",
       }).save();
-      await new Code({
-        code: "Our dear test no.2",
+      await new Cat({
+        cat: "Our dear test no.2",
       }).save();
-      await new Code({
-        code: "Our dear test no.3",
+      await new Cat({
+        cat: "Our dear test no.3",
       }).save();
-      await new Code({
-        code: "Strange name for autocomplete",
+      await new Cat({
+        cat: "Strange name for autocomplete",
       }).save();
     });
-    it("it should GET all the codes with right count", (done) => {
+    it("it should GET all the cat with right count", (done) => {
       chai
         .request(server)
-        .post("/code/list")
+        .post("/cat/list")
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.a("object");
@@ -136,7 +135,7 @@ describe("Codes", () => {
       };
       chai
         .request(server)
-        .post("/code/list")
+        .post("/cat/list")
         .send(filters)
         .end((err, res) => {
           res.should.have.status(200);
@@ -155,11 +154,11 @@ describe("Codes", () => {
       };
 
       const shouldGet = {
-        code: "Our dear test no.1",
+        cat: "Our dear test no.1",
       };
       chai
         .request(server)
-        .post("/code/list")
+        .post("/cat/list")
         .send(filters)
         .end((err, res) => {
           res.should.have.status(200);
@@ -168,7 +167,7 @@ describe("Codes", () => {
           res.body.payload.length.should.be.eql(1);
           res.body.page.should.eql(1);
           res.body.count.should.be.eql(4);
-          res.body.payload[0].code.should.be.eql(shouldGet.code);
+          res.body.payload[0].cat.should.be.eql(shouldGet.cat);
           done();
         });
     });
@@ -180,11 +179,11 @@ describe("Codes", () => {
       };
 
       const shouldGet = {
-        code: "Our dear test no.2",
+        cat: "Our dear test no.2",
       };
       chai
         .request(server)
-        .post("/code/list")
+        .post("/cat/list")
         .send(filters)
         .end((err, res) => {
           res.should.have.status(200);
@@ -193,7 +192,7 @@ describe("Codes", () => {
           res.body.payload.length.should.be.eql(1);
           res.body.page.should.eql(2);
           res.body.count.should.be.eql(4);
-          res.body.payload[0].code.should.be.eql(shouldGet.code);
+          res.body.payload[0].cat.should.be.eql(shouldGet.cat);
           done();
         });
     });
@@ -202,15 +201,15 @@ describe("Codes", () => {
       const filters = {
         limit: 1,
         page: 1,
-        autocomplete: { key: "code", value: "strange" },
+        autocomplete: { key: "cat", value: "strange" },
       };
 
       const shouldGet = {
-        code: "Strange name for autocomplete",
+        cat: "Strange name for autocomplete",
       };
       chai
         .request(server)
-        .post("/code/list")
+        .post("/cat/list")
         .send(filters)
         .end((err, res) => {
           res.should.have.status(200);
@@ -219,7 +218,7 @@ describe("Codes", () => {
           res.body.payload.length.should.be.eql(1);
           res.body.page.should.eql(1);
           res.body.count.should.be.eql(1);
-          res.body.payload[0].code.should.be.eql(shouldGet.code);
+          res.body.payload[0].cat.should.be.eql(shouldGet.cat);
           done();
         });
     });
@@ -228,12 +227,12 @@ describe("Codes", () => {
       const filters = {
         limit: 20,
         page: 1,
-        autocomplete: { key: "code", value: "test" },
+        autocomplete: { key: "cat", value: "test" },
       };
 
       chai
         .request(server)
-        .post("/code/list")
+        .post("/cat/list")
         .send(filters)
         .end((err, res) => {
           res.should.have.status(200);
@@ -246,16 +245,16 @@ describe("Codes", () => {
         });
     });
 
-    it("it should do order by -code everything", (done) => {
+    it("it should do order by -cat everything", (done) => {
       const filters = {
         limit: 20,
         page: 1,
-        sort: "-code",
+        sort: "-cat",
       };
 
       chai
         .request(server)
-        .post("/code/list")
+        .post("/cat/list")
         .send(filters)
         .end((err, res) => {
           res.should.have.status(200);
@@ -264,26 +263,26 @@ describe("Codes", () => {
           res.body.payload.length.should.be.eql(4);
           res.body.page.should.eql(1);
           res.body.count.should.be.eql(4);
-          res.body.payload[0].code.should.be.eql(
+          res.body.payload[0].cat.should.be.eql(
             "Strange name for autocomplete"
           );
-          res.body.payload[1].code.should.be.eql("Our dear test no.3");
-          res.body.payload[2].code.should.be.eql("Our dear test no.2");
-          res.body.payload[3].code.should.be.eql("Our dear test no.1");
+          res.body.payload[1].cat.should.be.eql("Our dear test no.3");
+          res.body.payload[2].cat.should.be.eql("Our dear test no.2");
+          res.body.payload[3].cat.should.be.eql("Our dear test no.1");
           done();
         });
     });
 
-    it("it should do order by +code everything", (done) => {
+    it("it should do order by +cat everything", (done) => {
       const filters = {
         limit: 20,
         page: 1,
-        sort: "+code",
+        sort: "+cat",
       };
 
       chai
         .request(server)
-        .post("/code/list")
+        .post("/cat/list")
         .send(filters)
         .end((err, res) => {
           res.should.have.status(200);
@@ -292,12 +291,12 @@ describe("Codes", () => {
           res.body.payload.length.should.be.eql(4);
           res.body.page.should.eql(1);
           res.body.count.should.be.eql(4);
-          res.body.payload[3].code.should.be.eql(
+          res.body.payload[3].cat.should.be.eql(
             "Strange name for autocomplete"
           );
-          res.body.payload[2].code.should.be.eql("Our dear test no.3");
-          res.body.payload[1].code.should.be.eql("Our dear test no.2");
-          res.body.payload[0].code.should.be.eql("Our dear test no.1");
+          res.body.payload[2].cat.should.be.eql("Our dear test no.3");
+          res.body.payload[1].cat.should.be.eql("Our dear test no.2");
+          res.body.payload[0].cat.should.be.eql("Our dear test no.1");
           done();
         });
     });
