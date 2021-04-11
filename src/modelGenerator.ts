@@ -40,6 +40,7 @@ const generateModel = (
     sort,
     page,
     limit,
+    when,
   }: IFindBy) {
     try {
       let searchFilter = autocomplete
@@ -51,7 +52,8 @@ const generateModel = (
           }
         : {};
 
-      let customFilter = { ...searchFilter };
+      let whenFilter = when ? { ...when } : {};
+      let customFilter = { ...searchFilter, ...whenFilter };
 
       let items = await this.find(customFilter)
         .populate(listPopulate)
@@ -119,7 +121,7 @@ const generateModel = (
     try {
       let deleted = await this.updateOne(
         { _id: id },
-        { $set: { active: false } }
+        { $set: { deleted: true } }
       );
       return {
         status: 200,
@@ -133,11 +135,11 @@ const generateModel = (
     }
   };
 
-  schema.statics.multipleDeleteBy = async function (query: string[]) {
+  schema.statics.multipleDeleteBy = async function (query: any) {
     try {
       let deleted = await this.updateMany(
-        { $or: query },
-        { $set: { active: false } }
+        { _id: { $in: query } },
+        { $set: { deleted: true } }
       );
       return {
         status: 200,

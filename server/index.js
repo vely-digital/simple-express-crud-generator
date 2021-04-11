@@ -17,7 +17,7 @@ const {
 } = process.env;
 
 const mongoUrl = `mongodb://${MONGO_IP}:${MONGO_PORT}/${MONGO_DATABASE_NAME}`,
-  port = NODE_ENV == "production" ? NODE_PORT : 5000;
+  port = NODE_ENV == "production" ? NODE_PORT : 5005;
 
 mongoose
   .connect(mongoUrl, {

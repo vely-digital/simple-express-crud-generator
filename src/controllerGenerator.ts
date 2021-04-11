@@ -36,7 +36,13 @@ const generateController = (
       }
     );
   } else {
-    router.post("/list", middlewareArray, customList);
+    router.post(
+      "/list",
+      middlewareArray,
+      async (req: CustomRequest, res: Response) => {
+        customList(req, res);
+      }
+    );
   }
 
   if (customGet == undefined) {
@@ -54,7 +60,13 @@ const generateController = (
       }
     );
   } else {
-    router.get("/:id", middlewareArray, customGet);
+    router.get(
+      "/:id",
+      middlewareArray,
+      async (req: CustomRequest, res: Response) => {
+        customGet(req, res);
+      }
+    );
   }
 
   if (customCreate == undefined) {
@@ -72,7 +84,14 @@ const generateController = (
       }
     );
   } else {
-    router.post("/", middlewareArray, customCreate);
+    console.log("customCreate", customCreate);
+    router.post(
+      "/",
+      middlewareArray,
+      async (req: CustomRequest, res: Response) => {
+        customCreate(req, res);
+      }
+    );
   }
 
   if (customDelete == undefined) {
@@ -90,7 +109,13 @@ const generateController = (
       }
     );
   } else {
-    router.delete("/", middlewareArray, customDelete);
+    router.delete(
+      "/",
+      middlewareArray,
+      async (req: CustomRequest, res: Response) => {
+        customDelete(req, res);
+      }
+    );
   }
 
   router.delete(
@@ -122,7 +147,13 @@ const generateController = (
       }
     );
   } else {
-    router.put(":id", middlewareArray, customEdit);
+    router.put(
+      ":id",
+      middlewareArray,
+      async (req: CustomRequest, res: Response) => {
+        customEdit(req, res);
+      }
+    );
   }
 };
 

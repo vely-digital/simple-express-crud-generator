@@ -8,6 +8,7 @@ const modelSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
+    deleted: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

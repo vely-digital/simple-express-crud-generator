@@ -12,11 +12,11 @@ export interface IGenerateModelArgs {
 }
 
 export interface IGenerateModelMethods {
-  customGet?: () => any;
-  customList?: () => any;
-  customCreate?: () => any;
-  customEdit?: () => any;
-  customDelete?: () => any;
+  customGet?: (req: any, res: any) => any;
+  customList?: (req: any, res: any) => any;
+  customCreate?: (req: any, res: any) => any;
+  customEdit?: (req: any, res: any) => any;
+  customDelete?: (req: any, res: any) => any;
 }
 
 interface IAutocomplete {
@@ -29,4 +29,5 @@ export interface IFindBy {
   sort: string;
   page: number;
   limit: number;
+  when: Object;
 }

@@ -70,7 +70,7 @@ generateModel(scheme, {listPopulate, listSelect, getPopulate, getSelect}, {custo
 
 parameter             |  description
 ----------------------|------------------------------------------------------------------------------------
-scheme                | Should be normal moongose scheme
+scheme                | Should be normal moongose scheme [documentation](https://mongoosejs.com/docs/guide.html)
 listPopulate          | Mongoose populate for LIST [documentation](https://mongoosejs.com/docs/populate.html)
 listSelect            | Mongoose select for LIST [documentation](https://mongoosejs.com/docs/queries.html)
 getPopulate           | Mongoose populate for GET [documentation](https://mongoosejs.com/docs/populate.html)
@@ -82,5 +82,8 @@ customEdit            | Custom function for EDIT
 customDelete          | Custom function for DELETE
 
 
+Controller Parameters:
+--------------------
 
+generateController(router, {customGet, customList, customCreate, customEdit, customDelete}, middleware)
 

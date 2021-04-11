@@ -1,6 +1,4 @@
-let mongoose = require("mongoose");
 let Cat = require("../server/model");
-
 let chai = require("chai");
 let chaiHttp = require("chai-http");
 let server = require("../server/index");
@@ -98,6 +96,91 @@ describe("cats", () => {
             done();
           });
       });
+    });
+  });
+
+  describe("/DELETE/:id cat", () => {
+    it("it should DELETE a cat", (done) => {
+      let cat = new Cat({
+        cat: "Our dear test no.2",
+      });
+
+      cat.save((err, cat) => {
+        chai
+          .request(server)
+          .delete("/cat/" + cat.id)
+          .end((err, res) => {
+            res.should.have.status(200);
+            res.body.should.be.a("object");
+            res.body.should.have.property("n").eql(1);
+            res.body.should.have.property("nModified").eql(1);
+            res.body.should.have.property("ok").eql(1);
+            done();
+          });
+      });
+    });
+    it("should get zero", (done) => {
+      const filters = {
+        when: {
+          deleted: false,
+        },
+      };
+      chai
+        .request(server)
+        .post("/cat/list")
+        .send(filters)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.a("object");
+          res.body.payload.should.be.a("array");
+          res.body.payload.length.should.be.eql(0);
+          res.body.count.should.be.eql(0);
+          done();
+        });
+    });
+  });
+
+  describe("/DELETE/multiple cats", async () => {
+    it("it should DELETE a cat", async () => {
+      let cat1 = await new Cat({
+        cat: "Our dear test no.1",
+      }).save();
+
+      let cat2 = await new Cat({
+        cat: "Our dear test no.2",
+      }).save();
+      const filter = [cat1._id, cat2._id];
+
+      chai
+        .request(server)
+        .delete("/cat")
+        .send(filter)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.a("object");
+          res.body.should.have.property("n").eql(2);
+          res.body.should.have.property("nModified").eql(2);
+          res.body.should.have.property("ok").eql(1);
+        });
+    });
+    it("should get zero", (done) => {
+      const filters = {
+        when: {
+          deleted: false,
+        },
+      };
+      chai
+        .request(server)
+        .post("/cat/list")
+        .send(filters)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.a("object");
+          res.body.payload.should.be.a("array");
+          res.body.payload.length.should.be.eql(0);
+          res.body.count.should.be.eql(0);
+          done();
+        });
     });
   });
 
@@ -297,6 +380,30 @@ describe("cats", () => {
           res.body.payload[2].cat.should.be.eql("Our dear test no.3");
           res.body.payload[1].cat.should.be.eql("Our dear test no.2");
           res.body.payload[0].cat.should.be.eql("Our dear test no.1");
+          done();
+        });
+    });
+    it("it should do filter by name", (done) => {
+      const filters = {
+        limit: 20,
+        page: 1,
+        when: { cat: "Strange name for autocomplete" },
+      };
+
+      chai
+        .request(server)
+        .post("/cat/list")
+        .send(filters)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.a("object");
+          res.body.payload.should.be.a("array");
+          res.body.payload.length.should.be.eql(1);
+          res.body.page.should.eql(1);
+          res.body.count.should.be.eql(1);
+          res.body.payload[0].cat.should.be.eql(
+            "Strange name for autocomplete"
+          );
           done();
         });
     });
