@@ -1,15 +1,17 @@
-let Cat = require("../server/model");
+const db = require("../server/sequalizeDatabase");
+const Cat = db.tutorials;
 let chai = require("chai");
 let chaiHttp = require("chai-http");
-let server = require("../server/index");
+let server = require("../server/sequalizeIndex");
 let should = chai.should();
 
 chai.use(chaiHttp);
 describe("cats", () => {
-  beforeEach((done) => {
+  beforeEach(async () => {
     //Before each test we empty the database
-    Cat.remove({}, (err) => {
-      done();
+    await Cat.destroy({
+      where: {},
+      truncate: true,
     });
   });
 
@@ -22,6 +24,7 @@ describe("cats", () => {
           const expectedObject = {
             count: 0,
             pageSize: 0,
+            page: 1,
             payload: [],
           };
           res.should.have.status(200);
@@ -44,7 +47,7 @@ describe("cats", () => {
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.a("object");
-          res.body.should.have.property("_id").and.to.be.an("string");
+          res.body.should.have.property("id").and.to.be.an("number");
           res.body.should.have
             .property("cat")
             .and.to.be.equal("Test our dear cat");
@@ -53,29 +56,27 @@ describe("cats", () => {
     });
   });
 
-  describe("/GET/:id cat", () => {
-    it("it should GET a cat by the given id", (done) => {
-      let cat = new Cat({
+  describe("/GET/:id cat", async () => {
+    it("it should GET a cat by the given id", async () => {
+      let cat = await Cat.create({
         cat: "Our dear test no.2",
       });
-      cat.save((err, cat) => {
-        chai
-          .request(server)
-          .get("/cat/" + cat.id)
-          .end((err, res) => {
-            res.should.have.status(200);
-            res.body.should.be.a("object");
-            res.body.should.have.property("cat");
-            res.body.should.have.property("_id").eql(cat.id);
-            done();
-          });
-      });
+
+      chai
+        .request(server)
+        .get("/cat/" + cat.id)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.a("object");
+          res.body.should.have.property("cat");
+          res.body.should.have.property("id").eql(cat.id);
+        });
     });
   });
 
   describe("/PUT/:id cat", () => {
-    it("it should PUT a cat by the given id and change it", (done) => {
-      let cat = new Cat({
+    it("it should PUT a cat by the given id and change it", async () => {
+      let cat = await Cat.create({
         cat: "Our dear test no.2",
       });
 
@@ -91,16 +92,15 @@ describe("cats", () => {
             res.should.have.status(200);
             res.body.should.be.a("object");
             res.body.should.have.property("cat").eql(changedCat.cat);
-            res.body.should.have.property("_id").eql(cat.id);
-            done();
+            res.body.should.have.property("id").eql(cat.id);
           });
       });
     });
   });
 
   describe("/DELETE/:id cat", () => {
-    it("it should DELETE a cat", (done) => {
-      let cat = new Cat({
+    it("it should DELETE a cat", async () => {
+      let cat = await Cat.create({
         cat: "Our dear test no.2",
       });
 
@@ -110,15 +110,12 @@ describe("cats", () => {
           .delete("/cat/" + cat.id)
           .end((err, res) => {
             res.should.have.status(200);
-            res.body.should.be.a("object");
-            res.body.should.have.property("n").eql(1);
-            res.body.should.have.property("nModified").eql(1);
-            res.body.should.have.property("ok").eql(1);
-            done();
+            res.body.should.be.a("array");
+            res.body[0].eql(1);
           });
       });
     });
-    it("should get zero", (done) => {
+    it("should get zero", async () => {
       const filters = {
         when: {
           deleted: false,
@@ -134,38 +131,37 @@ describe("cats", () => {
           res.body.payload.should.be.a("array");
           res.body.payload.length.should.be.eql(0);
           res.body.count.should.be.eql(0);
-          done();
         });
     });
   });
 
   describe("/DELETE/multiple cats", async () => {
     it("it should DELETE a cat", async () => {
-      let cat1 = await new Cat({
+      let cat1 = await Cat.create({
         cat: "Our dear test no.1",
-      }).save();
+      });
 
-      let cat2 = await new Cat({
+      let cat2 = await Cat.create({
         cat: "Our dear test no.2",
-      }).save();
-      const filter = [cat1._id, cat2._id];
+      });
 
+      const filter = [cat1.id, cat2.id];
+      console.log("FILTER", filter);
       chai
         .request(server)
         .delete("/cat")
         .send(filter)
         .end((err, res) => {
+          console.log("RES", res.body);
           res.should.have.status(200);
-          res.body.should.be.a("object");
-          // res.body.should.have.property("n").eql(2);
-          // res.body.should.have.property("nModified").eql(2);
-          // res.body.should.have.property("ok").eql(1);
+          res.body.should.be.a("array");
+          //   res.body[0].eql(2);
         });
     });
     it("should get zero", async () => {
       const filters = {
         when: {
-          deleted: true,
+          deleted: false,
         },
       };
       chai
@@ -182,26 +178,29 @@ describe("cats", () => {
     });
   });
 
-  describe("/GET cat, test list general", async () => {
+  describe("/GET cat, test list general", () => {
     beforeEach(async () => {
-      await new Cat({
+      await Cat.create({
         cat: "Our dear test no.1",
-      }).save();
-      await new Cat({
+      });
+
+      await Cat.create({
         cat: "Our dear test no.2",
-      }).save();
-      await new Cat({
+      });
+      await Cat.create({
         cat: "Our dear test no.3",
-      }).save();
-      await new Cat({
+      });
+      await Cat.create({
         cat: "Strange name for autocomplete",
-      }).save();
+      });
     });
     it("it should GET all the cat with right count", (done) => {
       chai
         .request(server)
         .post("/cat/list")
         .end((err, res) => {
+          console.log("catlistres", res.body);
+
           res.should.have.status(200);
           res.body.should.be.a("object");
           res.body.payload.should.be.a("array");
@@ -219,6 +218,7 @@ describe("cats", () => {
         .post("/cat/list")
         .send(filters)
         .end((err, res) => {
+          console.log("catlistres", res.body);
           res.should.have.status(200);
           res.body.should.be.a("object");
           res.body.payload.should.be.a("array");
@@ -293,6 +293,7 @@ describe("cats", () => {
         .post("/cat/list")
         .send(filters)
         .end((err, res) => {
+          console.log("TETETEADSADSADSADSADAS", res.body);
           res.should.have.status(200);
           res.body.should.be.a("object");
           res.body.payload.should.be.a("array");
@@ -308,7 +309,7 @@ describe("cats", () => {
       const filters = {
         limit: 20,
         page: 1,
-        autocomplete: { key: "cat", value: "test" },
+        autocomplete: { key: "cat", value: "our" },
       };
 
       chai

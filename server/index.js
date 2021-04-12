@@ -3,36 +3,44 @@ const mongoose = require("mongoose");
 const app = express();
 var bodyParser = require("body-parser");
 
+const { MongoMemoryServer } = require("mongodb-memory-server");
+
 const dotenv = require("dotenv");
 dotenv.config();
 
 const controller = require("./controller");
 
-const {
-  MONGO_IP,
-  MONGO_PORT,
-  MONGO_DATABASE_NAME,
-  NODE_ENV,
-  NODE_PORT,
-} = process.env;
+const mongoServer = new MongoMemoryServer();
 
-const mongoUrl = `mongodb://${MONGO_IP}:${MONGO_PORT}/${MONGO_DATABASE_NAME}`,
-  port = NODE_ENV == "production" ? NODE_PORT : 5005;
+mongoose.Promise = Promise;
+mongoServer.getUri().then((mongoUri) => {
+  const mongooseOpts = {
+    autoReconnect: true,
+    reconnectTries: Number.MAX_VALUE,
+    reconnectInterval: 1000,
+  };
 
-mongoose
-  .connect(mongoUrl, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log("MongoDB connected…"))
-  .catch((err) => console.log(err));
+  mongoose.connect(mongoUri, mongooseOpts);
+
+  mongoose.connection.on("error", (e) => {
+    if (e.message.code === "ETIMEDOUT") {
+      console.log(e);
+      mongoose.connect(mongoUri, mongooseOpts);
+    }
+    console.log(e);
+  });
+
+  mongoose.connection.once("open", () => {
+    console.log(`MongoDB successfully connected to ${mongoUri}`);
+  });
+});
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json());
 
 app.use("/cat", controller);
 
-app.listen(port);
-console.log("App is listening on port " + port);
+app.listen(5004);
+console.log("App is listening on port " + 5004);
 
 module.exports = app;
