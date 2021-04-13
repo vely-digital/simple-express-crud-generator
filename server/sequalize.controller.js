@@ -5,6 +5,6 @@ const Model = db.tutorials;
 
 const options = {};
 
-Generator.controllerGenerator(router, Model, options);
+Generator.controllerGenerator(router, Model, options, false);
 
 module.exports = router;

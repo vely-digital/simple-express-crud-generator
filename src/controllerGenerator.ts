@@ -20,6 +20,7 @@ const generateController = (
     customEdit,
     customDelete,
   }: IGenerateModelMethods = {},
+  multiTenant: boolean = false,
   middlewareArray: any = noMiddleware
 ) => {
   if (customList == undefined) {
@@ -27,7 +28,18 @@ const generateController = (
       "/list",
       middlewareArray,
       async (req: CustomRequest, res: Response) => {
-        const saveItem = await model.findBy(req.body);
+        let saveItem = undefined;
+        if (multiTenant) {
+          const schemaHeader = req.header("Schema");
+          if (!schemaHeader) {
+            saveItem = await model().findBy(req.body);
+          } else {
+            saveItem = await model(schemaHeader).findBy(req.body);
+          }
+        } else {
+          saveItem = await model.findBy(req.body);
+        }
+
         if (saveItem.status === 200) {
           res.json(saveItem.payload);
         } else {
@@ -50,7 +62,19 @@ const generateController = (
       "/:id",
       middlewareArray,
       async (req: CustomRequest, res: Response) => {
-        let modelGet = await model.findOneBy(req.params.id);
+        let modelGet = undefined;
+        console.log("got in model");
+        if (multiTenant) {
+          console.log("got in multitenant");
+          const schemaHeader = req.header("Schema");
+          if (!schemaHeader) {
+            modelGet = await model().findOneBy(req.params.id);
+          } else {
+            modelGet = await model(schemaHeader).findOneBy(req.params.id);
+          }
+        } else {
+          modelGet = await model.findOneBy(req.params.id);
+        }
 
         if (modelGet.status === 200) {
           res.json(modelGet.payload);
@@ -74,7 +98,17 @@ const generateController = (
       "/",
       middlewareArray,
       async (req: CustomRequest, res: Response) => {
-        const items = await model.createBy(req.body);
+        let items = undefined;
+        if (multiTenant) {
+          const schemaHeader = req.header("Schema");
+          if (!schemaHeader) {
+            items = await model().createBy(req.body);
+          } else {
+            items = await model(schemaHeader).createBy(req.body);
+          }
+        } else {
+          items = await model.createBy(req.body);
+        }
 
         if (items.status == 200) {
           res.send(items.payload);
@@ -99,7 +133,17 @@ const generateController = (
       "/:id",
       middlewareArray,
       async (req: CustomRequest, res: Response) => {
-        const items = await model.deleteBy(req.params.id);
+        let items = undefined;
+        if (multiTenant) {
+          const schemaHeader = req.header("Schema");
+          if (!schemaHeader) {
+            items = await model().deleteBy(req.params.id);
+          } else {
+            items = await model(schemaHeader).deleteBy(req.params.id);
+          }
+        } else {
+          items = await model.deleteBy(req.params.id);
+        }
 
         if (items.status == 200) {
           res.send(items.payload);
@@ -122,7 +166,17 @@ const generateController = (
     "/",
     middlewareArray,
     async (req: CustomRequest, res: Response) => {
-      const items = await model.multipleDeleteBy(req.body);
+      let items = undefined;
+      if (multiTenant) {
+        const schemaHeader = req.header("Schema");
+        if (!schemaHeader) {
+          items = await model().multipleDeleteBy(req.body);
+        } else {
+          items = await model(schemaHeader).multipleDeleteBy(req.body);
+        }
+      } else {
+        items = await model.multipleDeleteBy(req.body);
+      }
 
       if (items.status == 200) {
         res.send(items.payload);
@@ -137,12 +191,22 @@ const generateController = (
       "/:id",
       middlewareArray,
       async (req: CustomRequest, res: Response) => {
-        const item = await model.editBy(req.params.id, req.body);
-
-        if (item.status == 200) {
-          res.send(item.payload);
+        let items = undefined;
+        if (multiTenant) {
+          const schemaHeader = req.header("Schema");
+          if (!schemaHeader) {
+            items = await model().editBy(req.params.id, req.body);
+          } else {
+            items = await model(schemaHeader).editBy(req.params.id, req.body);
+          }
         } else {
-          res.status(500).send(item.payload);
+          items = await model.editBy(req.params.id, req.body);
+        }
+
+        if (items.status == 200) {
+          res.send(items.payload);
+        } else {
+          res.status(500).send(items.payload);
         }
       }
     );

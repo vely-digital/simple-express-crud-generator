@@ -61,12 +61,12 @@ describe("cats", () => {
       cat.save((err, cat) => {
         chai
           .request(server)
-          .get("/cat/" + cat.id)
+          .get("/cat/" + cat._id)
           .end((err, res) => {
             res.should.have.status(200);
             res.body.should.be.a("object");
             res.body.should.have.property("cat");
-            res.body.should.have.property("_id").eql(cat.id);
+            res.body.should.have.property("_id");
             done();
           });
       });

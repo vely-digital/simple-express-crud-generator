@@ -18,6 +18,7 @@ const generateModel = (
 ) => {
   schema.statics.findOneBy = async function (id: string) {
     try {
+      console.log("got in model", id);
       let payload = await this.findOne({ _id: id })
         .populate(getPopulate)
         .select(getSelect);

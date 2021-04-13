@@ -4,6 +4,6 @@ const Generator = require("../dist/index");
 
 const options = {};
 
-Generator.controllerGenerator(router, Model, options);
+Generator.controllerGenerator(router, Model, options, false);
 
 module.exports = router;

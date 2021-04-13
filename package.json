@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node ./server/index.js",
     "sqlStart": "node ./server/sequalizeIndex.js",
+    "tenantStart": "node ./server/postgreMulti/index.js",
     "build": "tsc --skipLibCheck",
     "test": "mocha --recursive --exit --timeout 10000"
   },
@@ -26,6 +27,8 @@
     "express": "^4.17.1",
     "mongoose": "^5.9.25",
     "mysql2": "^2.2.5",
+    "pg": "^8.5.1",
+    "pg-hstore": "^2.3.3",
     "sequelize": "^6.6.2"
   }
 }
