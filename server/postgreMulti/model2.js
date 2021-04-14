@@ -2,12 +2,12 @@ const { DataTypes, Op } = require("sequelize");
 const Generator = require("../../dist/index");
 
 module.exports = (sequelize, Sequelize) => {
-  const Cat1 = sequelize.define("cat1", {
-    cat: DataTypes.TEXT,
+  const Cat2 = sequelize.define("cat2", {
+    cat2: DataTypes.TEXT,
     deleted: { type: DataTypes.BOOLEAN, defaultValue: false },
   });
 
-  Generator.generateSqlModel(Cat1, {});
+  Generator.generateSqlModel(Cat2, {});
 
-  return Cat1;
+  return Cat2;
 };

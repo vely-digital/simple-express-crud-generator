@@ -2,6 +2,7 @@ import {
   IGenerateModelArgs,
   IGenerateModelMethods,
   IFindBy,
+  IBelongsToMany,
 } from "./interfaces/modelGeneratorInterfaces";
 
 const { Op } = require("sequelize");
@@ -18,6 +19,7 @@ const generateModel = (
   }: IGenerateModelMethods = {}
 ) => {
   let joinsLulz: any = [];
+  let createJoins: any = [];
 
   schema.associateBelongsTo = (models: []) => {
     models.map((model: any) => {
@@ -29,6 +31,20 @@ const generateModel = (
   schema.associateHasMany = (models: []) => {
     models.map((model: []) => {
       schema.hasMany(model);
+    });
+  };
+
+  schema.associateBelongsToMany = (models: any) => {
+    models.map((model: any) => {
+      schema.belongsToMany(model.model, model.value);
+      joinsLulz.push({
+        model: model.model,
+        as: model.value.as ? model.value.as : undefined,
+      });
+      createJoins.push({
+        model: model.model,
+        as: model.value.as ? model.value.as : undefined,
+      });
     });
   };
 
@@ -124,9 +140,8 @@ const generateModel = (
   };
 
   schema.createBy = async function (model: object) {
-    console.log("createBy", model);
     try {
-      let saved = await this.build(model).save();
+      let saved = await this.create(model, { include: createJoins });
 
       return {
         status: 200,

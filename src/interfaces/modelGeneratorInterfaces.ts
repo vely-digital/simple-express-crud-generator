@@ -31,3 +31,8 @@ export interface IFindBy {
   limit: number;
   when: Object;
 }
+
+export interface IBelongsToMany {
+  model: Object;
+  value: Object;
+}

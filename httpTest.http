@@ -24,6 +24,41 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZjI0YzM0MjlhNzAz
 
 ######
 
+POST http://localhost:5005/cat/
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZjI0YzM0MjlhNzAzODQzMjg2YjBmM2UiLCJpYXQiOjE1OTYzODEzNjJ9.BIRWPGNV10VfzC02M1Nt3SNZNax3WtWWPX_UsRqK6Qo
+
+{
+    "cat": "test cat22",
+    "cat1s": [
+        {"cat2": 1}, {"cat2" : 2}
+    ]
+}
+
+######
+
+PUT http://localhost:5005/cat/test/2
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZjI0YzM0MjlhNzAzODQzMjg2YjBmM2UiLCJpYXQiOjE1OTYzODEzNjJ9.BIRWPGNV10VfzC02M1Nt3SNZNax3WtWWPX_UsRqK6Qo
+
+
+{ "ids":
+[
+    1,2
+]
+}
+####
+
+
+POST http://localhost:5005/cat/list
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZjI0YzM0MjlhNzAzODQzMjg2YjBmM2UiLCJpYXQiOjE1OTYzODEzNjJ9.BIRWPGNV10VfzC02M1Nt3SNZNax3WtWWPX_UsRqK6Qo
+
+{
+}
+
+######
+
 GET http://localhost:5005/cat/1
 Content-Type: application/json
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZjI0YzM0MjlhNzAzODQzMjg2YjBmM2UiLCJpYXQiOjE1OTYzODEzNjJ9.BIRWPGNV10VfzC02M1Nt3SNZNax3WtWWPX_UsRqK6Qo
