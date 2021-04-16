@@ -23,8 +23,11 @@ const generateModel = (
 
   schema.associateBelongsTo = (models: []) => {
     models.map((model: any) => {
-      schema.belongsTo(model);
-      joinsLulz.push({ model: model });
+      schema.belongsTo(model.model, model.value);
+      joinsLulz.push({
+        model: model.model,
+        as: model?.value?.as ? model.value.as : undefined,
+      });
     });
   };
 
