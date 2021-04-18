@@ -1,6 +1,6 @@
 {
-  "name": "simple-express-crud-generator",
-  "version": "1.0.0",
+  "name": "@vely-digital/simple-express-crud-generator",
+  "version": "0.1.0",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
@@ -10,8 +10,12 @@
     "build": "tsc --skipLibCheck",
     "test": "mocha --recursive --exit --timeout 10000"
   },
-  "author": "",
+  "author": "Filip Patafta",
   "license": "MIT",
+  "publishConfig": {
+    "cache": "~/.npm",
+    "registry": "git://github.com/vely-digital/simple-express-crud-generator.git"
+  },
   "devDependencies": {
     "@types/express": "github:types/npm-express",
     "@types/mongoose": "^5.10.4",
