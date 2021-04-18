@@ -12,10 +12,11 @@
   },
   "author": "Filip Patafta",
   "license": "MIT",
-  "publishConfig": {
-    "cache": "~/.npm",
-    "registry": "git://github.com/vely-digital/simple-express-crud-generator.git"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vely-digital/simple-express-crud-generator.git"
   },
+  "homepage": "https://github.com/vely-digital/simple-express-crud-generator/blob/master/README.md",
   "devDependencies": {
     "@types/express": "github:types/npm-express",
     "@types/mongoose": "^5.10.4",
