@@ -162,7 +162,7 @@ const generateModel = (
       if (saved) {
         await saved.update(model);
       } else {
-        await saved.save();
+        await this.createBy(model);
       }
 
       return {

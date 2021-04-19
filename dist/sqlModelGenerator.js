@@ -146,7 +146,7 @@ const generateModel = (schema, { listPopulate, listSelect, getPopulate, getSelec
                     yield saved.update(model);
                 }
                 else {
-                    yield saved.save();
+                    yield this.createBy(model);
                 }
                 return {
                     status: 200,
