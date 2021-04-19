@@ -142,9 +142,12 @@ const generateModel = (schema, { listPopulate, listSelect, getPopulate, getSelec
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 let saved = yield this.findOne({ where: { id: id } });
-                yield saved.update(model);
-                console.log(saved);
-                yield saved.save();
+                if (saved) {
+                    yield saved.update(model);
+                }
+                else {
+                    yield saved.save();
+                }
                 return {
                     status: 200,
                     payload: saved,

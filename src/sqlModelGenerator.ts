@@ -159,9 +159,11 @@ const generateModel = (
   schema.editBy = async function (id: any, model: object) {
     try {
       let saved = await this.findOne({ where: { id: id } });
-      await saved.update(model);
-      console.log(saved);
-      await saved.save();
+      if (saved) {
+        await saved.update(model);
+      } else {
+        await saved.save();
+      }
 
       return {
         status: 200,
