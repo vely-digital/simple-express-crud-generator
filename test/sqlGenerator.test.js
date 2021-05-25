@@ -293,7 +293,6 @@ describe("cats", () => {
         .post("/cat/list")
         .send(filters)
         .end((err, res) => {
-          console.log("TETETEADSADSADSADSADAS", res.body);
           res.should.have.status(200);
           res.body.should.be.a("object");
           res.body.payload.should.be.a("array");

@@ -82,7 +82,7 @@ const generateModel = (
       let searchFilter = autocomplete
         ? {
             [autocomplete.key]: {
-              [Op.like]: autocomplete.value + "%",
+              [Op.like]: "%" + autocomplete.value + "%",
             },
           }
         : {};
