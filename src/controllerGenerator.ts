@@ -28,14 +28,11 @@ const generateController = (
       "/list",
       middlewareArray,
       async (req: CustomRequest, res: Response) => {
+        const database = res.locals.database;
+
         let saveItem = undefined;
-        if (multiTenant) {
-          const schemaHeader = req.header("Schema");
-          if (!schemaHeader) {
-            saveItem = await model().findBy(req.body);
-          } else {
-            saveItem = await model(schemaHeader).findBy(req.body);
-          }
+        if (multiTenant && database) {
+          saveItem = await database[model].findBy(req.body);
         } else {
           saveItem = await model.findBy(req.body);
         }
@@ -63,15 +60,10 @@ const generateController = (
       middlewareArray,
       async (req: CustomRequest, res: Response) => {
         let modelGet = undefined;
-        console.log("got in model");
+        const database = res.locals.database;
+
         if (multiTenant) {
-          console.log("got in multitenant");
-          const schemaHeader = req.header("Schema");
-          if (!schemaHeader) {
-            modelGet = await model().findOneBy(req.params.id);
-          } else {
-            modelGet = await model(schemaHeader).findOneBy(req.params.id);
-          }
+          modelGet = await database[model].findOneBy(req.params.id);
         } else {
           modelGet = await model.findOneBy(req.params.id);
         }
@@ -99,13 +91,10 @@ const generateController = (
       middlewareArray,
       async (req: CustomRequest, res: Response) => {
         let items = undefined;
+        const database = res.locals.database;
+
         if (multiTenant) {
-          const schemaHeader = req.header("Schema");
-          if (!schemaHeader) {
-            items = await model().createBy(req.body);
-          } else {
-            items = await model(schemaHeader).createBy(req.body);
-          }
+          items = await database[model].createBy(req.body);
         } else {
           items = await model.createBy(req.body);
         }
@@ -134,13 +123,10 @@ const generateController = (
       middlewareArray,
       async (req: CustomRequest, res: Response) => {
         let items = undefined;
+        const database = res.locals.database;
+
         if (multiTenant) {
-          const schemaHeader = req.header("Schema");
-          if (!schemaHeader) {
-            items = await model().deleteBy(req.params.id);
-          } else {
-            items = await model(schemaHeader).deleteBy(req.params.id);
-          }
+          items = await database[model].deleteBy(req.params.id);
         } else {
           items = await model.deleteBy(req.params.id);
         }
@@ -167,13 +153,10 @@ const generateController = (
     middlewareArray,
     async (req: CustomRequest, res: Response) => {
       let items = undefined;
+      const database = res.locals.database;
+
       if (multiTenant) {
-        const schemaHeader = req.header("Schema");
-        if (!schemaHeader) {
-          items = await model().multipleDeleteBy(req.body);
-        } else {
-          items = await model(schemaHeader).multipleDeleteBy(req.body);
-        }
+        items = await database[model].multipleDeleteBy(req.body);
       } else {
         items = await model.multipleDeleteBy(req.body);
       }
@@ -192,13 +175,10 @@ const generateController = (
       middlewareArray,
       async (req: CustomRequest, res: Response) => {
         let items = undefined;
+        const database = res.locals.database;
+
         if (multiTenant) {
-          const schemaHeader = req.header("Schema");
-          if (!schemaHeader) {
-            items = await model().editBy(req.params.id, req.body);
-          } else {
-            items = await model(schemaHeader).editBy(req.params.id, req.body);
-          }
+          items = await database[model].editBy(req.params.id, req.body);
         } else {
           items = await model.editBy(req.params.id, req.body);
         }

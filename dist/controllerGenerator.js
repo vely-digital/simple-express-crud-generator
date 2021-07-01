@@ -15,15 +15,10 @@ const noMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
 const generateController = (router, model, { customGet, customList, customCreate, customEdit, customDelete, } = {}, multiTenant = false, middlewareArray = noMiddleware) => {
     if (customList == undefined) {
         router.post("/list", middlewareArray, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+            const database = res.locals.database;
             let saveItem = undefined;
-            if (multiTenant) {
-                const schemaHeader = req.header("Schema");
-                if (!schemaHeader) {
-                    saveItem = yield model().findBy(req.body);
-                }
-                else {
-                    saveItem = yield model(schemaHeader).findBy(req.body);
-                }
+            if (multiTenant && database) {
+                saveItem = yield database[model].findBy(req.body);
             }
             else {
                 saveItem = yield model.findBy(req.body);
@@ -44,16 +39,9 @@ const generateController = (router, model, { customGet, customList, customCreate
     if (customGet == undefined) {
         router.get("/:id", middlewareArray, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             let modelGet = undefined;
-            console.log("got in model");
+            const database = res.locals.database;
             if (multiTenant) {
-                console.log("got in multitenant");
-                const schemaHeader = req.header("Schema");
-                if (!schemaHeader) {
-                    modelGet = yield model().findOneBy(req.params.id);
-                }
-                else {
-                    modelGet = yield model(schemaHeader).findOneBy(req.params.id);
-                }
+                modelGet = yield database[model].findOneBy(req.params.id);
             }
             else {
                 modelGet = yield model.findOneBy(req.params.id);
@@ -74,14 +62,9 @@ const generateController = (router, model, { customGet, customList, customCreate
     if (customCreate == undefined) {
         router.post("/", middlewareArray, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             let items = undefined;
+            const database = res.locals.database;
             if (multiTenant) {
-                const schemaHeader = req.header("Schema");
-                if (!schemaHeader) {
-                    items = yield model().createBy(req.body);
-                }
-                else {
-                    items = yield model(schemaHeader).createBy(req.body);
-                }
+                items = yield database[model].createBy(req.body);
             }
             else {
                 items = yield model.createBy(req.body);
@@ -103,14 +86,9 @@ const generateController = (router, model, { customGet, customList, customCreate
     if (customDelete == undefined) {
         router.delete("/:id", middlewareArray, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             let items = undefined;
+            const database = res.locals.database;
             if (multiTenant) {
-                const schemaHeader = req.header("Schema");
-                if (!schemaHeader) {
-                    items = yield model().deleteBy(req.params.id);
-                }
-                else {
-                    items = yield model(schemaHeader).deleteBy(req.params.id);
-                }
+                items = yield database[model].deleteBy(req.params.id);
             }
             else {
                 items = yield model.deleteBy(req.params.id);
@@ -130,14 +108,9 @@ const generateController = (router, model, { customGet, customList, customCreate
     }
     router.delete("/", middlewareArray, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         let items = undefined;
+        const database = res.locals.database;
         if (multiTenant) {
-            const schemaHeader = req.header("Schema");
-            if (!schemaHeader) {
-                items = yield model().multipleDeleteBy(req.body);
-            }
-            else {
-                items = yield model(schemaHeader).multipleDeleteBy(req.body);
-            }
+            items = yield database[model].multipleDeleteBy(req.body);
         }
         else {
             items = yield model.multipleDeleteBy(req.body);
@@ -152,14 +125,9 @@ const generateController = (router, model, { customGet, customList, customCreate
     if (customEdit == undefined) {
         router.put("/:id", middlewareArray, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             let items = undefined;
+            const database = res.locals.database;
             if (multiTenant) {
-                const schemaHeader = req.header("Schema");
-                if (!schemaHeader) {
-                    items = yield model().editBy(req.params.id, req.body);
-                }
-                else {
-                    items = yield model(schemaHeader).editBy(req.params.id, req.body);
-                }
+                items = yield database[model].editBy(req.params.id, req.body);
             }
             else {
                 items = yield model.editBy(req.params.id, req.body);

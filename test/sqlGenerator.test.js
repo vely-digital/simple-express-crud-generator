@@ -83,6 +83,7 @@ describe("cats", () => {
       let changedCat = {
         cat: "Out dear changed test no.3 :)",
       };
+
       cat.save((err, cat) => {
         chai
           .request(server)
@@ -194,6 +195,7 @@ describe("cats", () => {
         cat: "Strange name for autocomplete",
       });
     });
+
     it("it should GET all the cat with right count", (done) => {
       chai
         .request(server)
@@ -288,6 +290,7 @@ describe("cats", () => {
       const shouldGet = {
         cat: "Strange name for autocomplete",
       };
+
       chai
         .request(server)
         .post("/cat/list")
