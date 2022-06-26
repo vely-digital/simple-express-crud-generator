@@ -1,6 +1,9 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { IGenerateModelMethods } from "./interfaces/modelGeneratorInterfaces";
-import { CustomRequest } from "./interfaces/controllerGeneratorInterfaces";
+import {
+  CustomRequest,
+  InfoController,
+} from "./interfaces/controllerGeneratorInterfaces";
 
 const noMiddleware = async (
   req: CustomRequest,
@@ -11,19 +14,33 @@ const noMiddleware = async (
 };
 
 const generateController = (
-  router: Router,
-  model: any,
-  {
-    customGet,
-    customList,
-    customCreate,
-    customEdit,
-    customDelete,
-  }: IGenerateModelMethods = {},
-  multiTenant: boolean = false,
-  middlewareArray: any = noMiddleware
+  info: InfoController
+  // router: Router,
+  // model: any,
+  // {
+  //   customGet,
+  //   customList,
+  //   customCreate,
+  //   customEdit,
+  //   customDelete,
+  // }: IGenerateModelMethods = {},
+  // multiTenant: boolean = false,
+  // middlewareArray: any = noMiddleware
 ) => {
-  if (customList == undefined) {
+  const router = info.router;
+  const model = info.model;
+  const customMethods: IGenerateModelMethods = info.customMethods
+    ? info.customMethods
+    : {};
+
+  const multiTenant = info.multiTenant ? info.multiTenant : false;
+  const middlewareArray = info.middlewareArray
+    ? info.middlewareArray
+    : noMiddleware;
+
+  const historyChange = info.historyChange ? info.historyChange : false;
+
+  if (customMethods.customList == undefined) {
     router.post(
       "/list",
       middlewareArray,
@@ -49,12 +66,12 @@ const generateController = (
       "/list",
       middlewareArray,
       async (req: CustomRequest, res: Response) => {
-        customList(req, res);
+        customMethods.customList(req, res);
       }
     );
   }
 
-  if (customGet == undefined) {
+  if (customMethods.customGet == undefined) {
     router.get(
       "/:id",
       middlewareArray,
@@ -80,12 +97,12 @@ const generateController = (
       "/:id",
       middlewareArray,
       async (req: CustomRequest, res: Response) => {
-        customGet(req, res);
+        customMethods.customGet(req, res);
       }
     );
   }
 
-  if (customCreate == undefined) {
+  if (customMethods.customCreate == undefined) {
     router.post(
       "/",
       middlewareArray,
@@ -107,17 +124,16 @@ const generateController = (
       }
     );
   } else {
-    console.log("customCreate", customCreate);
     router.post(
       "/",
       middlewareArray,
       async (req: CustomRequest, res: Response) => {
-        customCreate(req, res);
+        customMethods.customCreate(req, res);
       }
     );
   }
 
-  if (customDelete == undefined) {
+  if (customMethods.customDelete == undefined) {
     router.delete(
       "/:id",
       middlewareArray,
@@ -129,6 +145,14 @@ const generateController = (
           items = await database[model].deleteBy(req.params.id);
         } else {
           items = await model.deleteBy(req.params.id);
+        }
+
+        if (historyChange) {
+          await database[historyChange.model].create({
+            user_id: res.locals.user.id,
+            enumConstant: `${historyChange.enumText}_DELETE`,
+            changeInfo: JSON.stringify({ id: req.params.id }),
+          });
         }
 
         if (items.status == 200) {
@@ -143,7 +167,7 @@ const generateController = (
       "/",
       middlewareArray,
       async (req: CustomRequest, res: Response) => {
-        customDelete(req, res);
+        customMethods.customDelete(req, res);
       }
     );
   }
@@ -161,6 +185,14 @@ const generateController = (
         items = await model.multipleDeleteBy(req.body);
       }
 
+      if (historyChange) {
+        await database[historyChange.model].create({
+          user_id: res.locals.user.id,
+          enumConstant: `${historyChange.enumText}_MULTIPLE_DELETE`,
+          changeInfo: JSON.stringify({ ids: req.body }),
+        });
+      }
+
       if (items.status == 200) {
         res.send(items.payload);
       } else {
@@ -169,7 +201,7 @@ const generateController = (
     }
   );
 
-  if (customEdit == undefined) {
+  if (customMethods.customEdit == undefined) {
     router.put(
       "/:id",
       middlewareArray,
@@ -181,6 +213,14 @@ const generateController = (
           items = await database[model].editBy(req.params.id, req.body);
         } else {
           items = await model.editBy(req.params.id, req.body);
+        }
+
+        if (historyChange) {
+          await database[historyChange.model].create({
+            user_id: res.locals.user.id,
+            enumConstant: `${historyChange.enumText}_EDIT`,
+            changeInfo: JSON.stringify({ id: req.params.id, change: req.body }),
+          });
         }
 
         if (items.status == 200) {
@@ -195,7 +235,7 @@ const generateController = (
       ":id",
       middlewareArray,
       async (req: CustomRequest, res: Response) => {
-        customEdit(req, res);
+        customMethods.customEdit(req, res);
       }
     );
   }

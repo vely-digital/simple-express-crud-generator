@@ -9,6 +9,9 @@ chai.use(chaiHttp);
 describe("cats", () => {
   beforeEach(async () => {
     //Before each test we empty the database
+    db.sequelize.sync({ force: false }).then(() => {
+      console.log("Drop and re-sync db.");
+    });
     await Cat.destroy({
       where: {},
       truncate: true,

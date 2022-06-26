@@ -12,8 +12,30 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const noMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     next();
 });
-const generateController = (router, model, { customGet, customList, customCreate, customEdit, customDelete, } = {}, multiTenant = false, middlewareArray = noMiddleware) => {
-    if (customList == undefined) {
+const generateController = (info
+// router: Router,
+// model: any,
+// {
+//   customGet,
+//   customList,
+//   customCreate,
+//   customEdit,
+//   customDelete,
+// }: IGenerateModelMethods = {},
+// multiTenant: boolean = false,
+// middlewareArray: any = noMiddleware
+) => {
+    const router = info.router;
+    const model = info.model;
+    const customMethods = info.customMethods
+        ? info.customMethods
+        : {};
+    const multiTenant = info.multiTenant ? info.multiTenant : false;
+    const middlewareArray = info.middlewareArray
+        ? info.middlewareArray
+        : noMiddleware;
+    const historyChange = info.historyChange ? info.historyChange : false;
+    if (customMethods.customList == undefined) {
         router.post("/list", middlewareArray, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             const database = res.locals.database;
             let saveItem = undefined;
@@ -33,10 +55,10 @@ const generateController = (router, model, { customGet, customList, customCreate
     }
     else {
         router.post("/list", middlewareArray, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-            customList(req, res);
+            customMethods.customList(req, res);
         }));
     }
-    if (customGet == undefined) {
+    if (customMethods.customGet == undefined) {
         router.get("/:id", middlewareArray, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             let modelGet = undefined;
             const database = res.locals.database;
@@ -56,10 +78,10 @@ const generateController = (router, model, { customGet, customList, customCreate
     }
     else {
         router.get("/:id", middlewareArray, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-            customGet(req, res);
+            customMethods.customGet(req, res);
         }));
     }
-    if (customCreate == undefined) {
+    if (customMethods.customCreate == undefined) {
         router.post("/", middlewareArray, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             let items = undefined;
             const database = res.locals.database;
@@ -78,12 +100,11 @@ const generateController = (router, model, { customGet, customList, customCreate
         }));
     }
     else {
-        console.log("customCreate", customCreate);
         router.post("/", middlewareArray, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-            customCreate(req, res);
+            customMethods.customCreate(req, res);
         }));
     }
-    if (customDelete == undefined) {
+    if (customMethods.customDelete == undefined) {
         router.delete("/:id", middlewareArray, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             let items = undefined;
             const database = res.locals.database;
@@ -92,6 +113,13 @@ const generateController = (router, model, { customGet, customList, customCreate
             }
             else {
                 items = yield model.deleteBy(req.params.id);
+            }
+            if (historyChange) {
+                yield database[historyChange.model].create({
+                    user_id: res.locals.user.id,
+                    enumConstant: `${historyChange.enumText}_DELETE`,
+                    changeInfo: JSON.stringify({ id: req.params.id }),
+                });
             }
             if (items.status == 200) {
                 res.send(items.payload);
@@ -103,7 +131,7 @@ const generateController = (router, model, { customGet, customList, customCreate
     }
     else {
         router.delete("/", middlewareArray, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-            customDelete(req, res);
+            customMethods.customDelete(req, res);
         }));
     }
     router.delete("/", middlewareArray, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -115,6 +143,13 @@ const generateController = (router, model, { customGet, customList, customCreate
         else {
             items = yield model.multipleDeleteBy(req.body);
         }
+        if (historyChange) {
+            yield database[historyChange.model].create({
+                user_id: res.locals.user.id,
+                enumConstant: `${historyChange.enumText}_MULTIPLE_DELETE`,
+                changeInfo: JSON.stringify({ ids: req.body }),
+            });
+        }
         if (items.status == 200) {
             res.send(items.payload);
         }
@@ -122,7 +157,7 @@ const generateController = (router, model, { customGet, customList, customCreate
             res.status(500).send(items.payload);
         }
     }));
-    if (customEdit == undefined) {
+    if (customMethods.customEdit == undefined) {
         router.put("/:id", middlewareArray, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             let items = undefined;
             const database = res.locals.database;
@@ -131,6 +166,13 @@ const generateController = (router, model, { customGet, customList, customCreate
             }
             else {
                 items = yield model.editBy(req.params.id, req.body);
+            }
+            if (historyChange) {
+                yield database[historyChange.model].create({
+                    user_id: res.locals.user.id,
+                    enumConstant: `${historyChange.enumText}_EDIT`,
+                    changeInfo: JSON.stringify({ id: req.params.id, change: req.body }),
+                });
             }
             if (items.status == 200) {
                 res.send(items.payload);
@@ -142,7 +184,7 @@ const generateController = (router, model, { customGet, customList, customCreate
     }
     else {
         router.put(":id", middlewareArray, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-            customEdit(req, res);
+            customMethods.customEdit(req, res);
         }));
     }
 };
