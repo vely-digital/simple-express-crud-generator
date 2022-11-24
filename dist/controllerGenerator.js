@@ -183,7 +183,7 @@ const generateController = (info
         }));
     }
     else {
-        router.put(":id", middlewareArray, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        router.put("/:id", middlewareArray, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             customMethods.customEdit(req, res);
         }));
     }
