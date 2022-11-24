@@ -232,7 +232,7 @@ const generateController = (
     );
   } else {
     router.put(
-      ":id",
+      "/:id",
       middlewareArray,
       async (req: CustomRequest, res: Response) => {
         customMethods.customEdit(req, res);
